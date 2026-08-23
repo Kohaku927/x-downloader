@@ -8,11 +8,10 @@ st.set_page_config(
     layout="centered",
 )
 
-# 2. 空白を詰めて美しく整えたデザインCSS
+# 2. デザインCSS（余白の調整とスタイリッシュなカード）
 st.markdown(
     """
     <style>
-    /* 上部の余白を削ってスッキリさせる */
     .block-container {
         padding-top: 2rem;
         padding-bottom: 2rem;
@@ -51,7 +50,6 @@ st.markdown(
         padding: 15px;
         margin-top: 15px;
     }
-    /* ガイドテキスト */
     .guide-box {
         background: rgba(56, 189, 248, 0.1);
         border-left: 4px solid #38bdf8;
@@ -75,18 +73,15 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# 4. 入力カード（謎の空白を排除）
+# 4. 入力カード
 st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-
 url = st.text_input(
     "🔗 X（Twitter）のポストURLを入力",
     placeholder="https://x.com/username/status/...",
 )
-
 submit_btn = st.button(
     "✨ 動画を抽出する", type="primary", use_container_width=True
 )
-
 st.markdown("</div>", unsafe_allow_html=True)
 
 # 5. 抽出処理
@@ -117,28 +112,28 @@ if submit_btn:
                     )
                     st.success("✅ 抽出成功！")
 
-                    # プレビュー表示
+                    # 動画プレビュー
                     st.video(video_url)
 
-                    # 親切な使い方ガイド
+                    # スマホ向け説明ガイド
                     st.markdown(
                         """
                     <div class="guide-box">
-                        <b>💡 スマホでの保存方法:</b><br>
-                        下の「動画ファイルを保存する」ボタンをタップするとダウンロードが始まります。
+                        <b>💡 保存方法:</b><br>
+                        下のボタンをタップすると、iPhoneのダウンロード確認画面が表示されます。
                     </div>
                     """,
                         unsafe_allow_html=True,
                     )
 
-                    # 確実にダウンロードさせるための直接リンク（download属性付き）
+                    # iPhoneのSafariで「ダウンロードしますか？」ポップアップを出しやすくするHTMLリンク
                     st.markdown(
                         f"""
                     <div style="text-align: center; margin-top: 10px;">
-                        <a href="{video_url}" download="{title}.mp4" 
+                        <a href="{video_url}" download="{title}.mp4" rel="noopener" 
                            style="background: linear-gradient(90deg, #38bdf8, #818cf8); color: white; padding: 14px 20px; 
                                   text-decoration: none; border-radius: 10px; font-weight: bold; display: block; text-align: center; font-size: 1.05rem;">
-                           📥 動画ファイルを保存する
+                           📥 端末に動画をダウンロード
                         </a>
                     </div>
                     """,
