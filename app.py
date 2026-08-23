@@ -8,19 +8,16 @@ st.set_page_config(
     layout="centered",
 )
 
-# 2. 洗練されたカスタムCSSデザイン（背景・カード・ボタン装飾）
+# 2. スマホ対応を含むデザインCSS
 st.markdown(
     """
     <style>
-    /* 全体の背景と文字色 */
     .stApp {
         background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
         color: #f8fafc;
     }
-    
-    /* メインタイトルの中央寄せ＆グラデーション */
     .main-title {
-        font-size: 2.5rem;
+        font-size: 2.2rem;
         font-weight: 800;
         background: linear-gradient(90deg, #38bdf8, #818cf8);
         -webkit-background-clip: text;
@@ -28,64 +25,57 @@ st.markdown(
         text-align: center;
         margin-bottom: 0.2rem;
     }
-    
-    /* サブタイトルのスタイル */
     .sub-title {
         color: #94a3b8;
         text-align: center;
-        margin-bottom: 2.5rem;
-        font-size: 1.05rem;
+        margin-bottom: 2rem;
+        font-size: 0.95rem;
     }
-
-    /* 入力エリアのコンテナ風カード */
     .glass-card {
         background: rgba(30, 41, 59, 0.7);
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 16px;
-        padding: 30px;
+        padding: 20px;
         box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
     }
-
-    /* 成功メッセージやプレビューの枠組み */
     .result-box {
-        background: rgba(15, 23, 42, 0.8);
+        background: rgba(15, 23, 42, 0.9);
         border: 1px solid #334155;
         border-radius: 12px;
-        padding: 20px;
+        padding: 15px;
         margin-top: 20px;
+        word-break: break-all;
     }
     </style>
 """,
     unsafe_allow_html=True,
 )
 
-# 3. ヘッダー表示
+# 3. ヘッダー
 st.markdown(
     "<div class='main-title'>🎬 X Video Downloader</div>", unsafe_allow_html=True
 )
 st.markdown(
-    "<div class='sub-title'>URLを貼り付けるだけで、どんな環境でも高速・安全に動画を抽出</div>",
+    "<div class='sub-title'>URLを貼り付けるだけで簡単・安全に動画を抽出</div>",
     unsafe_allow_html=True,
 )
 
-# 4. メイン入力をカード風のデザインで囲む
+# 4. 入力カード
 st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
 
 url = st.text_input(
     "🔗 X（Twitter）のポストURL",
-    placeholder="https://x.com/username/status/123456789...",
+    placeholder="https://x.com/username/status/...",
 )
 
-col1, col2, col3 = st.columns([1, 2, 1])
-with col2:
-    submit_btn = st.button(
-        "✨ 動画を抽出する", type="primary", use_container_width=True
-    )
+submit_btn = st.button(
+    "✨ 動画を抽出する", type="primary", use_container_width=True
+)
 
 st.markdown("</div>", unsafe_allow_html=True)
 
-# 5. 抽出ロジック
+# 5. 抽出処理
 if submit_btn:
     if not url:
         st.warning("⚠️ URLを入力してください。")
@@ -112,14 +102,21 @@ if submit_btn:
                         "<div class='result-box'>", unsafe_allow_html=True
                     )
                     st.success("✅ 抽出に成功しました！")
+
+                    # プレビュー表示
                     st.video(video_url)
+
+                    # iPhone対応の案内と保存用ボタン
                     st.markdown(
                         f"""
                     <div style="text-align: center; margin-top: 15px;">
-                        <a href="{video_url}" target="_blank" download="{title}.mp4" 
-                           style="background: linear-gradient(90deg, #38bdf8, #818cf8); color: white; padding: 10px 24px; 
-                                  text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
-                           📥 動画ファイルを保存する
+                        <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 8px;">
+                            ※iPhoneでうまく保存できない場合は、下のボタンを長押しして「リンク先のファイルをダウンロード」を選択してください
+                        </p>
+                        <a href="{video_url}" target="_blank" 
+                           style="background: linear-gradient(90deg, #38bdf8, #818cf8); color: white; padding: 12px 20px; 
+                                  text-decoration: none; border-radius: 8px; font-weight: bold; display: block; text-align: center;">
+                           📥 動画ファイルを保存する（別タブで開く）
                         </a>
                     </div>
                     """,
@@ -128,8 +125,8 @@ if submit_btn:
                     st.markdown("</div>", unsafe_allow_html=True)
                 else:
                     st.error(
-                        "❌ 動画が見つかりませんでした。このポストには動画が含まれていない可能性があります。"
+                        "❌ 動画が見つかりませんでした。動画が含まれていない可能性があります。"
                     )
 
             except Exception as e:
-                st.error(f"❌ 抽出エラーが発生しました。\n\n詳細: `{e}`")
+                st.error(f"❌ エラーが発生しました。\n\n詳細: `{e}`")
