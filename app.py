@@ -1,3 +1,4 @@
+import base64
 import streamlit as st
 import yt_dlp
 
@@ -8,7 +9,7 @@ st.set_page_config(
     layout="centered",
 )
 
-# 2. スマホ対応を含むデザインCSS
+# 2. デザインCSS
 st.markdown(
     """
     <style>
@@ -63,16 +64,13 @@ st.markdown(
 
 # 4. 入力カード
 st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-
 url = st.text_input(
     "🔗 X（Twitter）のポストURL",
     placeholder="https://x.com/username/status/...",
 )
-
 submit_btn = st.button(
     "✨ 動画を抽出する", type="primary", use_container_width=True
 )
-
 st.markdown("</div>", unsafe_allow_html=True)
 
 # 5. 抽出処理
@@ -95,7 +93,7 @@ if submit_btn:
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     info = ydl.extract_info(url, download=False)
                     video_url = info.get("url")
-                    title = info.get("title", "video")
+                    title = info.get("title", "x_video")
 
                 if video_url:
                     st.markdown(
@@ -106,22 +104,36 @@ if submit_btn:
                     # プレビュー表示
                     st.video(video_url)
 
-                    # iPhone対応の案内と保存用ボタン
-                    st.markdown(
-                        f"""
-                    <div style="text-align: center; margin-top: 15px;">
-                        <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 8px;">
-                            ※iPhoneでうまく保存できない場合は、下のボタンを長押しして「リンク先のファイルをダウンロード」を選択してください
-                        </p>
-                        <a href="{video_url}" target="_blank" 
-                           style="background: linear-gradient(90deg, #38bdf8, #818cf8); color: white; padding: 12px 20px; 
-                                  text-decoration: none; border-radius: 8px; font-weight: bold; display: block; text-align: center;">
-                           📥 動画ファイルを保存する（別タブで開く）
-                        </a>
-                    </div>
-                    """,
-                        unsafe_allow_html=True,
-                    )
+                    # Streamlit標準のダウンロードボタン（これがiPhoneやPCで最も確実に保存できます）
+                    import urllib.request
+
+                    try:
+                        # 動画データを一時的にダウンロードしてボタンに組み込む
+                        with urllib.request.urlopen(video_url) as response:
+                            video_bytes = response.read()
+
+                        st.download_button(
+                            label="📥 【保存】動画ファイルをダウンロード",
+                            data=video_bytes,
+                            file_name=f"{title}.mp4",
+                            mime="video/mp4",
+                            use_container_width=True,
+                        )
+                    except Exception:
+                        # 万が一データ取得が重い場合のフォールバック（別タブ直リンク）
+                        st.markdown(
+                            f"""
+                        <div style="text-align: center; margin-top: 15px;">
+                            <a href="{video_url}" target="_blank" 
+                               style="background: linear-gradient(90deg, #38bdf8, #818cf8); color: white; padding: 12px 20px; 
+                                      text-decoration: none; border-radius: 8px; font-weight: bold; display: block; text-align: center;">
+                                📥 動画を開く（長押ししてダウンロード）
+                            </a>
+                        </div>
+                        """,
+                            unsafe_allow_html=True,
+                        )
+
                     st.markdown("</div>", unsafe_allow_html=True)
                 else:
                     st.error(
